@@ -33,6 +33,16 @@ def najmanji_kvadrat(file,colour="red",xlabel="x os", ylabel="y os", title="x/y 
         plt.legend([linelegend,scatterlegend])
         plt.savefig("graf najmanjeg kvadrata.png")
         plt.show()
+
+        ysquaredlist=[i**2 for i in y]
+        ysquaredmean=aritm_sred(ysquaredlist)
+        print("a=",koeficijent_smjera)
+        print("b=",odsjecak)
+        sigma_a=mt.sqrt(1/len(x)*((ysquaredmean-(y_mean**2))/(xsquaredmean-(x_mean**2))-(koeficijent_smjera**2)))
+        sigma_b=sigma_a*mt.sqrt(xsquaredmean-(x_mean**2))
+        print("pogreška a=",sigma_a)
+        print("pogreška b=",sigma_b)
+        
 def stand_dev(lista):
     sum=0
     for i in lista:
