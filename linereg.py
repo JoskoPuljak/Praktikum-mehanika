@@ -86,4 +86,18 @@ def stand_dev(lista):
     print(sum)
     standardna=mt.sqrt(sum/((len(lista)-1)*len(lista)))
     return(standardna)
+def plot(file,colour="red",xlabel="x os", ylabel="y os", title="x/y graf",linelegend="graf ovisnosti",scatterlegend="pravi podaci"):
+    with open (file, "r") as csv_file:
+        csv_reader=csv.reader(csv_file)
+        xy=[[float(line[0]),float(line[1])] for line in csv_reader]
+        x=[i for i in xy]
+        y=[y for i in xy]
+        plt.plot(x,graf,color=colour)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.title(title)
+        plt.scatter(x,y,color=colour)
+        plt.legend([linelegend,scatterlegend])
+        plt.savefig("graf.png")
+        plt.show()
 
