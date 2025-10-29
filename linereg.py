@@ -1,22 +1,22 @@
 import math as mt
 import csv
 import matplotlib.pyplot as plt
+import scipy.optimize as opt
+import numpy as np
 def aritm_sred(lista):
     sum=0
     for a in lista:
         sum=sum + a
     sredina=sum/len(lista)
     return(sredina)
-def najmanji_kvadrat(file,colour="red",xlabel="x os", ylabel="y os", title="x/y graf",linelegend="graf linearne regresije",scatterlegend="pravi podaci"):
+def najmanji_kvadrat(file,colour="red",barcolour="black", xlabel="x os", ylabel="y os", title="x/y graf",linelegend="graf linearne regresije",scatterlegend="pravi podaci"):
     with open (file, "r") as csv_file:
         csv_reader=csv.reader(csv_file)
-        xy=[[float(line[0]),float(line[1]),float(line[2]),float(line[3])] for line in csv_reader]
+        xy=[[float(line[0]),float(line[1]),float(line[2])] for line in csv_reader]
         #x=[i[0] for i in xy]
-        x=[(i[0]/100)**2 for i in xy]
-        T_avg=[aritm_sred([i[1],i[2],i[3]]) for i in xy]
-        #y=[i[1] for i in xy]
-        T=[t/3 for t in T_avg]
-        y=[i**2 for i in T]
+        x=[mt.log(i[0]) for i in xy]
+        y=[i[1] for i in xy]
+        yerror=[i[2] for i in xy]
         x_mean=aritm_sred(x)
         y_mean=aritm_sred(y)
         product=[i*j for i,j in zip(x,y)]
@@ -33,7 +33,8 @@ def najmanji_kvadrat(file,colour="red",xlabel="x os", ylabel="y os", title="x/y 
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.title(title)
-        plt.scatter(x,y,color=colour)
+        plt.errorbar(x,y,color=barcolour, yerr=[abs(x) for x in yerror], fmt='o', barsabove=True, capsize=5)
+        #plt.scatter(x,y,color="black")
         plt.legend([linelegend,scatterlegend])
         plt.savefig("graf najmanjeg kvadrata.png")
         plt.show()
@@ -83,7 +84,6 @@ def stand_dev(lista):
     sum=0
     for i in lista:
         sum+=(i-aritm_sred(lista))**2
-    print(sum)
     standardna=mt.sqrt(sum/((len(lista)-1)*len(lista)))
     return(standardna)
 def plot(file,colour="red",xlabel="x os", ylabel="y os", title="x/y graf",linelegend="graf ovisnosti",scatterlegend="pravi podaci"):
@@ -99,5 +99,29 @@ def plot(file,colour="red",xlabel="x os", ylabel="y os", title="x/y graf",linele
         plt.scatter(x,y,color=colour)
         plt.legend([linelegend,scatterlegend])
         plt.savefig("graf.png")
+        plt.show()
+def sci_fitting(file,colour="red",barcolour="black",xlabel="x os", ylabel="y os", title="x/y graf",linelegend="graf ovisnosti",scatterlegend="pravi podaci"):
+    with open (file, "r") as csv_file:
+        csv_reader=csv.reader(csv_file)
+        xy=[[float(line[0]),float(line[1]),float(line[2])] for line in csv_reader]
+        x=[np.log(i[0]) for i in xy]
+        y=[i[1] for i in xy]
+        yerror=[i[2] for i in xy]
+        def func(x,a,b):
+            return a*x + b
+        popt, pcov = opt.curve_fit(func, x, y)
+        print("a=",popt[0])
+        print("b=",popt[1])
+        perr = np.sqrt(np.diag(pcov))
+        print("pogreška a=",perr[0])
+        print("pogreška b=",perr[1])
+        #print(*popt)
+        plt.plot(x, [func(i,popt[0],popt[1]) for i in x], color=colour)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.title(title)
+        plt.errorbar(x,y,yerr=[abs(x) for x in yerror],fmt='o',color=barcolour, barsabove=True, capsize=5)
+        plt.legend([linelegend,scatterlegend])
+        plt.savefig("graf scipy.png")
         plt.show()
 
