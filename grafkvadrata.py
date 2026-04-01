@@ -2,30 +2,41 @@ import linereg as linrg
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
-def r_perp(x):
-      n=1.5
-      return -(np.sqrt(n**2-(np.sin(x))**2)-np.cos(x))**2/(n**2-1)
-with open ("podaci.csv", "r") as csv_file:
+from scipy.optimize import curve_fit
+
+with open ("podaci4.csv", "r") as csv_file:
         csv_reader=csv.reader(csv_file)
-        xy=[[float(line[0]),float(line[1]),float(line[2])] for line in csv_reader]
-        x=[np.radians(i[0]) for i in xy]
-        y=[-np.sqrt(i[1]/70) for i in xy]
-        y_real=[r_perp(i) for i in x]
-        plt.scatter(x,y)
-        plt.plot(x,y_real)
-        
-def r_par(x):
-       n=1.376
-       return (n**2*(np.cos(x))-np.sqrt(n**2-(np.sin(x))**2))/(n**2*(np.cos(x))+np.sqrt(n**2-(np.sin(x))**2))
-with open ("podaci2.csv", "r") as csv_file2:
-        csv_reader2=csv.reader(csv_file2)
-        xy2=[[float(line[0]),float(line[1]),float(line[2])] for line in csv_reader2]
-        x2=[np.radians(i[0]) for i in xy2]
-        y2=[(-1)**((xy2.index(i)//16)+1)*np.sqrt(i[1]/89) for i in xy2]
-        x_real=np.linspace(x2[0],x2[-1],1000)
-        y_real2=r_par(x_real)
-        plt.scatter(x2,y2)
-        plt.plot(x_real,y_real2)
-        
-        plt.savefig("privremeno.png")
-        plt.show()
+        xy=[[float(line[0]),float(line[1]),float(line[2]),float(line[3])] for line in csv_reader]
+        x_data=[(i[0]) for i in xy]
+        y_data=[i[1]/1000 for i in xy]
+        x2_data=[(i[2]) for i in xy]
+        y2_data=[i[3]/1000 for i in xy]
+
+def exponential_model(x,a,b):
+       Iks=0.0035+0.0003*(np.exp(4.404))*((75/100)**(-1.903))
+       return Iks-a*(np.exp(b*x)-1)
+fit_params,covariance_matrix=curve_fit(exponential_model, x_data, y_data,p0=(0.0035,3))
+a_fit, b_fit = fit_params
+a_error, b_error= np.sqrt(np.diag(covariance_matrix))
+x_fit = np.linspace(min(x_data), max(x_data), 200)
+y_fit = exponential_model(x_fit, a_fit, b_fit)
+print([a_fit, b_fit])
+print([a_error, b_error])
+plt.scatter(x_data,y_data,color="black")
+plt.plot(x_fit,y_fit,color="cyan")
+plt.ylabel("I[A]",fontsize=14)
+plt.xlabel("U[V]",fontsize=14)
+plt.title("Ovisnost struje o naponu",fontsize=18)
+fit_params2,covariance_matrix2=curve_fit(exponential_model, x2_data, y2_data,p0=(0.0035,3))
+a_fit2, b_fit2 = fit_params2
+a_error2, b_error2= np.sqrt(np.diag(covariance_matrix2))
+x_fit2 = np.linspace(min(x2_data), max(x2_data), 200)
+y_fit2 = exponential_model(x_fit2, a_fit2, b_fit2)
+plt.scatter(x2_data,y2_data,color="gray")
+plt.plot(x_fit2,y_fit2,color="lime")
+plt.legend(["podaci za T=33°C","regresija za T=33°C","podaci za T=45°C","regresija za T=45°C"])
+plt.savefig("privremeno2.png")
+plt.show()
+
+print([a_fit2, b_fit2])
+print([a_error2, b_error2])
