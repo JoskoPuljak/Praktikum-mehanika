@@ -14,9 +14,9 @@ def najmanji_kvadrat(file,colour="red",barcolour="black", xlabel="x os", ylabel=
         csv_reader=csv.reader(csv_file)
         xy=[[float(line[0]),float(line[1]),float(line[2])] for line in csv_reader]
         #x=[i[0] for i in xy]
-        x=[mt.log(i[0]) for i in xy]
-        y=[i[1] for i in xy]
-        yerror=[i[2] for i in xy]
+        x=[i[1]-45 for i in xy]
+        y=[i[0]/1000000 for i in xy]
+        #yerror=[i[2] for i in xy]
         x_mean=aritm_sred(x)
         y_mean=aritm_sred(y)
         product=[i*j for i,j in zip(x,y)]
@@ -33,8 +33,8 @@ def najmanji_kvadrat(file,colour="red",barcolour="black", xlabel="x os", ylabel=
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.title(title)
-        plt.errorbar(x,y,color=barcolour, yerr=[abs(x) for x in yerror], fmt='o', barsabove=True, capsize=5)
-        #plt.scatter(x,y,color="black")
+        #plt.errorbar(x,y,color=barcolour, yerr=[abs(x) for x in yerror], fmt='o', barsabove=True, capsize=5)
+        plt.scatter(x,y,color="black")
         plt.legend([linelegend,scatterlegend])
         plt.savefig("graf najmanjeg kvadrata.png")
         plt.show()
@@ -47,12 +47,12 @@ def najmanji_kvadrat(file,colour="red",barcolour="black", xlabel="x os", ylabel=
         sigma_b=sigma_a*mt.sqrt(xsquaredmean-(x_mean**2))
         print("pogreška a=",sigma_a)
         print("pogreška b=",sigma_b)
-def najmanji_kvadrat_lite(file,colour="red",xlabel="x os", ylabel="y os", title="x/y graf",linelegend="graf linearne regresije",scatterlegend="pravi podaci"):
+def najmanji_kvadrat_lite(file,colour="red",xlabel="x os", ylabel="y os", title="x/y graf",linelegend="graf linearne regresije",scatterlegend="podaci"):
     with open (file, "r") as csv_file:
         csv_reader=csv.reader(csv_file)
         xy=[[float(line[0]),float(line[1])] for line in csv_reader]
-        x=[mt.radians(i[0]) for i in xy]
-        y=[(i[1]/1000)*9.81*0.20 for i in xy]
+        x=[i[1]-45 for i in xy]
+        y=[i[0]/1000000 for i in xy]
         x_mean=aritm_sred(x)
         y_mean=aritm_sred(y)
         product=[i*j for i,j in zip(x,y)]
@@ -65,8 +65,9 @@ def najmanji_kvadrat_lite(file,colour="red",xlabel="x os", ylabel="y os", title=
         koeficijent_smjera=(product_mean/xsquaredmean)
         sigma_a=mt.sqrt((1/len(x))*((ysquaredmean/xsquaredmean)-(koeficijent_smjera**2)))
         kx=[koeficijent_smjera*i for i in x]
-
+        plt.figure(figsize=(10,8))
         plt.plot(x,kx,color=colour)
+        
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.title(title)
