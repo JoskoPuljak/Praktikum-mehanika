@@ -12,10 +12,11 @@ def aritm_sred(lista):
 def najmanji_kvadrat(file,colour="red",barcolour="black", xlabel="x os", ylabel="y os", title="x/y graf",linelegend="graf linearne regresije",scatterlegend="pravi podaci"):
     with open (file, "r") as csv_file:
         csv_reader=csv.reader(csv_file)
-        xy=[[float(line[0]),float(line[1])] for line in csv_reader]
-        x=[1/(101325+ i[1]*10*133.3) for i in xy]
-        y=[(np.pi*(1.14/2)**2*i[0]+1.01)*10**(-6) for i in xy]
-        #yerror=[2*i[2]*i[1] for i in xy]
+        xy=[[float(line[0]),float(line[1]),float(line[2])] for line in csv_reader]
+        #x=[i[0] for i in xy]
+        x=[i[1]-45 for i in xy]
+        y=[i[0]/1000000 for i in xy]
+        #yerror=[i[2] for i in xy]
         x_mean=aritm_sred(x)
         y_mean=aritm_sred(y)
         product=[i*j for i,j in zip(x,y)]
@@ -27,11 +28,11 @@ def najmanji_kvadrat(file,colour="red",barcolour="black", xlabel="x os", ylabel=
         kx=[koeficijent_smjera*i for i in x]
         graf=[i + odsjecak for i in kx]
         plt.plot(x,graf,color=colour)
-        plt.xlabel(xlabel,labelpad=1.0,fontsize=14)
-        plt.ylabel(ylabel,labelpad=1.0,fontsize=14)
-        plt.title(title,fontsize=18)
-        plt.errorbar(x,y,color=barcolour, fmt='o', barsabove=True, capsize=5)
-        #plt.scatter(x,y,color="black")
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.title(title)
+        #plt.errorbar(x,y,color=barcolour, yerr=[abs(x) for x in yerror], fmt='o', barsabove=True, capsize=5)
+        plt.scatter(x,y,color="black")
         plt.legend([linelegend,scatterlegend])
         plt.savefig("graf najmanjeg kvadrata.png")
         plt.show()
@@ -47,9 +48,8 @@ def najmanji_kvadrat_lite(file,colour="red",xlabel="x os", ylabel="y os", title=
     with open (file, "r") as csv_file:
         csv_reader=csv.reader(csv_file)
         xy=[[float(line[0]),float(line[1])] for line in csv_reader]
-        x=[i[0]+273.15 for i in xy]
-        y=[(np.pi*(1.14/2)**2*i[1]+1.01)*10**(-6) for i in xy]
-        n=[(101400*y[i]*273.15)/(101325*0.0224*x[i]) for i in range(len(x))]
+        x=[i[1]-45 for i in xy]
+        y=[i[0]/1000000 for i in xy]
         x_mean=aritm_sred(x)
         y_mean=aritm_sred(y)
         product=[i*j for i,j in zip(x,y)]
@@ -62,12 +62,13 @@ def najmanji_kvadrat_lite(file,colour="red",xlabel="x os", ylabel="y os", title=
         koeficijent_smjera=(product_mean/xsquaredmean)
         sigma_a=mt.sqrt((1/len(x))*((ysquaredmean/xsquaredmean)-(koeficijent_smjera**2)))
         kx=[koeficijent_smjera*i for i in x]
-        #plt.figure(figsize=(8,7))
+        plt.figure(figsize=(10,8))
         plt.plot(x,kx,color=colour)
-        plt.xlabel(xlabel,fontsize=14)
-        plt.ylabel(ylabel,fontsize=14)
-        plt.title(title,fontsize=18)
-        plt.scatter(x,y,color="black")
+        
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.title(title)
+        plt.scatter(x,y,color=colour)
         plt.legend([linelegend,scatterlegend])
         plt.savefig("grafkvadrata2.png")
         plt.show()
